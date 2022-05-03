@@ -14,8 +14,10 @@
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
+    "lib": ["ES2020"],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthr,oughCasesInSwitch": false
+  },
+  "include": ["src"]
 }
