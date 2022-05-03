@@ -17,7 +17,7 @@
     "lib": ["ES2020"],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthr,oughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false
   },
   "include": ["src"]
 }

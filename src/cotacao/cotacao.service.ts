@@ -260,7 +260,7 @@ export class CotacaoService {
 
 				const fullUrl = contratoEmpresa + numeroEmpresa + numeroCotacao + cnpjFornecedor + codFornecedor + dataVencimento;
 
-				const prefixUrl = 'http://localhost:3005/painel/cotacao/' + fullUrl;
+				const prefixUrl = 'http://success.vps-kinghost.net:3050/painel/cotacao/' + fullUrl;
 				//const prefixUrl = 'https://cotacaocliente-8gzt77vgm-thislucasme.vercel.app/painel/cotacao/' + fullUrl;
 
 				//await enviar email
