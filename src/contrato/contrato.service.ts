@@ -8,6 +8,7 @@ import { DatabaseCotacaoService } from 'src/database/database-cotacao.service';
 import { SiteSuccessDatabaseService } from 'src/database/site-success-database.service';
 import { SuccessDatabaseService } from 'src/database/success-database.service';
 import { Empresa } from './contrato';
+//
 
 @Injectable()
 export class ContratoService {
