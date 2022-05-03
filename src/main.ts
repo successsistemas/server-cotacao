@@ -22,6 +22,7 @@ async function bootstrap() {
       'http://localhost:5000',
       //   'http://localhost:3001',
     ],
+    methods: ["GET", "POST"],
   })
 
   //app.enableCors();
