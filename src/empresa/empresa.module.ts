@@ -1,5 +1,5 @@
-import { EmpresaController } from './empresa.controller';
-import { EmpresaService } from './empresa.service';
+import { EmpresaController } from 'src/empresa/empresa.controller';
+import { EmpresaService } from 'src/empresa/empresa.service';
 /*
 https://docs.nestjs.com/modules
 */
