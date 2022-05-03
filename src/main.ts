@@ -23,7 +23,7 @@ async function bootstrap() {
   //   credentials: true,
   // });
 
-  app.enableCors({ credentials: true, origin: "http://localhost:3005" })
+  app.enableCors({ credentials: true, origin: "http://localhost:3005/" })
 
   // app.enableCors({
   //   origin: [
