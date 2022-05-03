@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { restaurar } from 'src/common/cripto';
 import { Empresa } from 'src/contrato/contrato';
 import { CriptoService } from 'src/cripto/cripto.service';
-import { EmpresautilService } from './empresa.util.service';
+import { EmpresautilService } from 'src/empresa/empresa.util.service';
 
 @Injectable()
 export class EmpresaService {
