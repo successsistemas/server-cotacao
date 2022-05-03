@@ -15,10 +15,17 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.enableCors({
-    allowedHeaders: "*",
-    origin: "*",
-  })
+
+  app.enableCors({ credentials: true, origin: "http://localhost:3005" })
+
+  // app.enableCors({
+  //   origin: [
+  //     'http://localhost:3005/',
+  //     'http://localhost:3001',
+  //     'http://localhost:5000',
+  //     //   'http://localhost:3001',
+  //   ],
+  // })
 
   //app.enableCors();
   //await app.listen(4005);
