@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { encode } from 'base-64';
 import knexfn from 'knex';
 import * as moment from 'moment';
@@ -16,7 +17,7 @@ moment.locale('pt-br')
 
 @Injectable()
 export class CotacaoService {
-	constructor(private readonly mailer: MailerService, private cotacaoDatabaseService: DatabaseCotacaoService, private contratoService: ContratoService, private criptoService: CriptoService) { }
+	constructor(private readonly mailer: MailerService, private cotacaoDatabaseService: DatabaseCotacaoService, private contratoService: ContratoService, private criptoService: CriptoService, configuracaoService: ConfigService) { }
 
 	async getEmpresaByCodigo(codigo: string, codigoEmpresa: string): Promise<Empresa | null> {
 		const knex = this.cotacaoDatabaseService.getConnection();
@@ -260,7 +261,7 @@ export class CotacaoService {
 
 				const fullUrl = contratoEmpresa + numeroEmpresa + numeroCotacao + cnpjFornecedor + codFornecedor + dataVencimento;
 
-				const prefixUrl = 'https://front-end-cotacao.vercel.app/painel/cotacao/' + fullUrl;
+				const prefixUrl = 'https://cotacao.success.inf.br/painel/cotacao/' + fullUrl;
 				//const prefixUrl = 'https://cotacaocliente-8gzt77vgm-thislucasme.vercel.app/painel/cotacao/' + fullUrl;
 
 				//await enviar email
