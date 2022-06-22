@@ -105,7 +105,7 @@ export class PriceService {
 		const knex = await this.getConexaoCliente(contrato)
 
 		// Aqui um exemplo de usar um objeto no select, acho que a sintaxe fica mais limpa
-		const result = await knex('deic' + empresa)
+		const itensCotacao = knex('deic' + empresa)
 			.leftJoin('dece' + empresa,
 				(k) => k.on(`dece${empresa}.codigo6`, `deic${empresa}.codigo6`).andOn(`dece${empresa}.item6`, `deic${empresa}.item6`)
 			)
@@ -113,7 +113,6 @@ export class PriceService {
 			.andWhere(`deic${empresa}.codigo6`, codigoCotacao)
 			.select(
 				{
-					//Aqui você termina de colocar as colunas que você quer, lembrando que como tem um join tem que incluir o nome da tabela antes
 					quantidade: `dece${empresa}.qtd6`,
 					marca: `dece${empresa}.marca6`,
 					descricao: `dece${empresa}.descricao6`,
@@ -132,12 +131,27 @@ export class PriceService {
 					desconto: `deic${empresa}.descot6`,
 					observacao: `deic${empresa}.observac6`,
 					prazo: `deic${empresa}.tempoent6`,
-					formaPagamento: `deic${empresa}.forpag6`
+
 				}
-			).debug(false)
+			).orderBy("item", "asc")
 
+		const valorTotalItens = knex.select(
+			knex.raw("ifnull(sum(valordoproduto * quantidade), 0) as valorTotal")
+		).from(itensCotacao)
+			.joinRaw("as valorTotalItens")
 
-		const array: Array<any> = result;
+		const totalFrete = knex.select(
+			knex.raw("ifnull(sum(frete), 0) as valorTotalFrete")
+		).from(itensCotacao)
+			.joinRaw("as valorTotalItens")
+
+		const totalDesconto = knex.select(
+			knex.raw("ifnull(sum(desconto), 0) as valorTotalDesconto")
+		).from(itensCotacao)
+			.joinRaw("as valorTotalItens")
+
+		console.log(await totalDesconto)
+		const array: Array<any> = await itensCotacao;
 		return [array];
 	}
 
