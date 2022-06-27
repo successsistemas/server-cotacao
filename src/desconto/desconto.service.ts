@@ -136,7 +136,7 @@ export class DescontoService {
 	}
 
 	async adicionarDescontoDev(descontoTDO: DescontoTDO) {
-
+		console.log(descontoTDO)
 		//cria a conexão 
 		const knex1 = await this.getConexaoCliente(descontoTDO.dados.contratoEmpresa)
 		//descriptografia dos dados codigoEmpresa, fornecedor etc. Dados esses recebidos por parametro criptografados.
@@ -146,8 +146,9 @@ export class DescontoService {
 
 		/*buscar no banco e somar o valor de custo de todos os itens para descobrir quanto
 			 em percentual é o valor do desconto que está sendo passado */
-		const itens = await this.priceService.getItensCotacao(descontoTDO.dados.codigo, descontoTDO.dados.fornecedor, descontoTDO.dados.contratoEmpresa, descontoTDO.dados.codigoEmpresa)
-		const itensCotacao: any[] = itens[0];
+		const data = await this.priceService.getItensCotacao(descontoTDO.dados.codigo, descontoTDO.dados.fornecedor, descontoTDO.dados.contratoEmpresa, descontoTDO.dados.codigoEmpresa)
+		console.log(data)
+		const itensCotacao: any[] = data.itens;
 
 
 		const itensTyped = calcularDiferencaDesconto(itensCotacao, descontoTDO)
@@ -162,7 +163,7 @@ export class DescontoService {
 				const query = knex1('deic' + empresa).update({
 					descot6: item.desconto,
 					despesa6: item.frete,
-					forpag6: descontoTDO.formaPagamento
+					forpag6: descontoTDO?.formaPagamento,
 				}).where('forneced6', fornecedor).andWhere('codigo6', codigoCotacao).andWhere("item6", item.item)
 					.transacting(trx).debug(false)
 				queries.push(query)

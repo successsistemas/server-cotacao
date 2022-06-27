@@ -25,12 +25,15 @@ export class PriceController {
 
 
 
-		const total = await this.priceService.calcularTotal(body, false);
-		const frete = await this.priceService.calcularFrete(body);
-		const data = await this.priceService.getItensCotacao(codCotacao, codFornecedor, codContrato, codEmpresa)
-		const totalDesconto = await this.priceService.calcularTotalDesconto(body);
+		// const total = await this.priceService.calcularTotal(body, false);
+		// const frete = await this.priceService.calcularFrete(body);
+		const { itens, totalDesconto, frete, total } = await this.priceService.getItensCotacao(codCotacao, codFornecedor, codContrato, codEmpresa);
 
-		const dataTratado = data[0];
+		// const totalDesconto = await this.priceService.calcularTotalDesconto(body);
+
+		const codigoCotacao = itens[0]?.codigo;
+		const formaPagamento = itens[0]?.formapagamento;
+		const dataTratado = itens;
 		let isReady = true;
 		for (let i = 0; i < dataTratado.length; i++) {
 			//	console.log(dados.marca)
@@ -40,7 +43,15 @@ export class PriceController {
 			}
 		}
 
-		return [data, total, totalDesconto, frete, [{ "isReady": isReady }], [{ "formaPagamento": data[0][0].formapagamento }], [{ "numeroCotacao": data[0][0].codigo }]];
+		return {
+			itens, total, totalDesconto, frete, isReady, codigoCotacao, formaPagamento
+		}
+		// return [
+		// 	[data, total, totalDesconto, frete,
+		// 	[{ "isReady": isReady }],
+		// 	[{ "formaPagamento": data[0].formapagamento }],
+		// 		[{ "numeroCotacao": data[0].codigo }]]
+		// ];
 	}
 	@Post('update')
 	async updateItemCotacao(@Body() body: types.ItemCotacaoTDO) {

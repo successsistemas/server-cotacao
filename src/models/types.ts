@@ -113,3 +113,29 @@ export type GenerateIdDataByArray = {
 	array: number[];
 	last: string;
 }
+export type Desconto = {
+	valorTotalDesconto: number;
+}
+export type TotalFrete = {
+	valorTotalFrete: number;
+}
+export type TotalItens = {
+	valorTotal: number;
+}
+export type DadosCotacao = {
+	itens: any[],
+	totalFrete: any
+}
+export type ItensCotacaoReturn = {
+	cotacoes: any[],
+	total: number,
+	totalDesconto: number,
+	totalFrete: number,
+	isReady: boolean,
+	formaPagamento: string,
+	numeroCotacao: string,
+	error: any,
+	mutate: any,
+	loading: boolean,
+	isValidating: boolean
+}

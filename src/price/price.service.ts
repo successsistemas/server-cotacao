@@ -4,7 +4,7 @@ import { Empresa } from 'src/contrato/contrato';
 import { CriptoService } from 'src/cripto/cripto.service';
 import { getOrCreateKnexInstance } from 'src/database/knexCache';
 import { SiteSuccessDatabaseService } from 'src/database/site-success-database.service';
-import { CotacaoTDOPayload } from 'src/models/types';
+import { CotacaoTDOPayload, Desconto, TotalFrete, TotalItens } from 'src/models/types';
 const ABNT_5891_1977 = require('arredondamentoabnt').ABNT_5891_1977
 const abnt = new ABNT_5891_1977(2);
 @Injectable()
@@ -132,27 +132,29 @@ export class PriceService {
 					observacao: `deic${empresa}.observac6`,
 					prazo: `deic${empresa}.tempoent6`,
 
+
 				}
 			).orderBy("item", "asc")
 
-		const valorTotalItens = knex.select(
+		const valorTotalItens = await knex.select<TotalItens[]>(
 			knex.raw("ifnull(sum(valordoproduto * quantidade), 0) as valorTotal")
 		).from(itensCotacao)
 			.joinRaw("as valorTotalItens")
 
-		const totalFrete = knex.select(
+		const totalFrete = await knex.select<TotalFrete[]>(
 			knex.raw("ifnull(sum(frete), 0) as valorTotalFrete")
 		).from(itensCotacao)
 			.joinRaw("as valorTotalItens")
 
-		const totalDesconto = knex.select(
+
+		const totalDesconto = await knex.select<Desconto[]>(
 			knex.raw("ifnull(sum(desconto), 0) as valorTotalDesconto")
 		).from(itensCotacao)
 			.joinRaw("as valorTotalItens")
 
-		console.log(await totalDesconto)
-		const array: Array<any> = await itensCotacao;
-		return [array];
+		const itensArray: any[] = await itensCotacao;
+		//data, total, totalDesconto, frete
+		return { itens: itensArray, totalDesconto: totalDesconto[0].valorTotalDesconto, frete: totalFrete[0].valorTotalFrete, total: valorTotalItens[0].valorTotal };
 	}
 
 	async calcularFrete(cotacaoPayLoad: CotacaoTDOPayload) {
