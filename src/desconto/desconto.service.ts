@@ -271,7 +271,7 @@ export class DescontoService {
 			forpag6  = ${descontoTDO.formaPagamento}
 				where codigo6 = '${codigoCotacao}'  and forneced6 = '${fornecedor}' and item6 != ${arrayIdGenerated.last}; `
 		);
-
+		console.log("*****************************");
 		const desconto = await knex1.schema.raw(
 			`update deic${empresa} as itens set descot6 = ${arrayGeneratedDesconto.last},
 			despesa6 = ${arrayGenerated.last},

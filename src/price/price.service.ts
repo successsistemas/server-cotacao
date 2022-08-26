@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { restaurar } from 'src/common/cripto';
 import { Empresa } from 'src/contrato/contrato';
 import { CriptoService } from 'src/cripto/cripto.service';
@@ -103,58 +103,64 @@ export class PriceService {
 		//const dadosEmpresa = await this.contratoService.getDadosConexao('1EDFFA7D75A6');
 
 		const knex = await this.getConexaoCliente(contrato)
+		try {
+			// Aqui um exemplo de usar um objeto no select, acho que a sintaxe fica mais limpa
+			const itensCotacao = knex('deic' + empresa)
+				.leftJoin('dece' + empresa,
+					(k) => k.on(`dece${empresa}.codigo6`, `deic${empresa}.codigo6`).andOn(`dece${empresa}.item6`, `deic${empresa}.item6`)
+				)
+				.where(`deic${empresa}.forneced6`, codigoFornecedor)
+				.andWhere(`deic${empresa}.codigo6`, codigoCotacao)
+				.select(
+					{
+						quantidade: `dece${empresa}.qtd6`,
+						marca: `dece${empresa}.marca6`,
+						descricao: `dece${empresa}.descricao6`,
+						data: `deic${empresa}.data6`,
+						codigo: `deic${empresa}.codigo6`,
+						item: `deic${empresa}.item6`,
+						produto: `deic${empresa}.produto6`,
+						valordoproduto: `deic${empresa}.custo6`,
+						frete: `deic${empresa}.despesa6`,
+						st: `deic${empresa}.icmsst6`,
+						icms: `deic${empresa}.icms6`,
+						ipi: `deic${empresa}.ipi6`,
+						mva: `deic${empresa}.mva6`,
+						codbarras: `deic${empresa}.codfabric6`,
+						formapagamento: `deic${empresa}.forpag6 `,
+						desconto: `deic${empresa}.descot6`,
+						observacao: `deic${empresa}.observac6`,
+						prazo: `deic${empresa}.tempoent6`,
+					}
+				).orderBy("item", "asc")
 
-		// Aqui um exemplo de usar um objeto no select, acho que a sintaxe fica mais limpa
-		const itensCotacao = knex('deic' + empresa)
-			.leftJoin('dece' + empresa,
-				(k) => k.on(`dece${empresa}.codigo6`, `deic${empresa}.codigo6`).andOn(`dece${empresa}.item6`, `deic${empresa}.item6`)
-			)
-			.where(`deic${empresa}.forneced6`, codigoFornecedor)
-			.andWhere(`deic${empresa}.codigo6`, codigoCotacao)
-			.select(
-				{
-					quantidade: `dece${empresa}.qtd6`,
-					marca: `dece${empresa}.marca6`,
-					descricao: `dece${empresa}.descricao6`,
-					data: `deic${empresa}.data6`,
-					codigo: `deic${empresa}.codigo6`,
-					item: `deic${empresa}.item6`,
-					produto: `deic${empresa}.produto6`,
-					valordoproduto: `deic${empresa}.custo6`,
-					frete: `deic${empresa}.despesa6`,
-					st: `deic${empresa}.icmsst6`,
-					icms: `deic${empresa}.icms6`,
-					ipi: `deic${empresa}.ipi6`,
-					mva: `deic${empresa}.mva6`,
-					codbarras: `deic${empresa}.codfabric6`,
-					formapagamento: `deic${empresa}.forpag6 `,
-					desconto: `deic${empresa}.descot6`,
-					observacao: `deic${empresa}.observac6`,
-					prazo: `deic${empresa}.tempoent6`,
+			const valorTotalItens = await knex.select<TotalItens[]>(
+				knex.raw("ifnull(sum(valordoproduto * quantidade), 0) as valorTotal")
+			).from(itensCotacao)
+				.joinRaw("as valorTotalItens")
 
-
-				}
-			).orderBy("item", "asc")
-
-		const valorTotalItens = await knex.select<TotalItens[]>(
-			knex.raw("ifnull(sum(valordoproduto * quantidade), 0) as valorTotal")
-		).from(itensCotacao)
-			.joinRaw("as valorTotalItens")
-
-		const totalFrete = await knex.select<TotalFrete[]>(
-			knex.raw("ifnull(sum(frete), 0) as valorTotalFrete")
-		).from(itensCotacao)
-			.joinRaw("as valorTotalItens")
+			const totalFrete = await knex.select<TotalFrete[]>(
+				knex.raw("ifnull(sum(frete), 0) as valorTotalFrete")
+			).from(itensCotacao)
+				.joinRaw("as valorTotalItens")
 
 
-		const totalDesconto = await knex.select<Desconto[]>(
-			knex.raw("ifnull(sum(desconto), 0) as valorTotalDesconto")
-		).from(itensCotacao)
-			.joinRaw("as valorTotalItens")
+			const totalDesconto = await knex.select<Desconto[]>(
+				knex.raw("ifnull(sum(desconto), 0) as valorTotalDesconto")
+			).from(itensCotacao)
+				.joinRaw("as valorTotalItens")
 
-		const itensArray: any[] = await itensCotacao;
-		//data, total, totalDesconto, frete
-		return { itens: itensArray, totalDesconto: totalDesconto[0].valorTotalDesconto, frete: totalFrete[0].valorTotalFrete, total: valorTotalItens[0].valorTotal };
+			const itensArray: any[] = await itensCotacao;
+			//data, total, totalDesconto, frete
+			return { itens: itensArray, totalDesconto: totalDesconto[0].valorTotalDesconto, frete: totalFrete[0].valorTotalFrete, total: valorTotalItens[0].valorTotal };
+		} catch (err: any) {
+			if (err?.errno === 1054) {
+				throw new HttpException({ message: err?.sqlMessage }, HttpStatus.BAD_REQUEST);
+			} else {
+				throw new HttpException({ message: "Ocorreu um erro ao recuperar os items da cotação" }, HttpStatus.BAD_REQUEST);
+			}
+
+		}
 	}
 
 	async calcularFrete(cotacaoPayLoad: CotacaoTDOPayload) {
